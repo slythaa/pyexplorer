@@ -114,7 +114,7 @@ while True:
 
         elif command_entered == command_list[2]:
             if len(user_list) > 2:
-                # TODO me when file won't copy 💀💀💀💀💀💀 its way past my bed time im going mimimimimimi
+                # TODO make file copying work
                 if os.path.isfile(user_list[1]) and os.path.isdir(user_list[2]):
                     cmd = f'copy "{user_list[1]}" "{"2" + user_list[1]}"'
                     os.system(cmd)
