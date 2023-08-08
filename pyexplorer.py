@@ -80,7 +80,7 @@ def cmds():
 # DON'T CHANGE THE ORDER
 command_list = ["move", "delete", "copy", "cd", "chdir", "cmds", "list", "quit", ".."]
 
-# Used fo the 'changedir' command, used to go up one directory
+# Used for the 'changedir' command, used to go up one directory
 go_up_one = command_list[8]
 
 while True:
