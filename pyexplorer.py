@@ -16,7 +16,10 @@ current_directory = os.getcwd()
 #print(current_directory)
 
 def create_directory(name):
-    pass
+    if os.path.isdir(name):
+        print("It is already a directory...")
+    else:
+        os.mkdir(name)
 
 # Move files!! |:O its a bit weird
 # Can't handle folder/file names with spaces in em, something to do with the .split(), fix later, works fine otherwise
@@ -44,7 +47,7 @@ def move_files(file, destination):
         else:
             print("Not a file in current directory")
 
-# TODO create file, not hard do now
+
 def create_file(file):
 
     isfile = os.path.isfile(file)
@@ -58,6 +61,9 @@ def create_file(file):
         except:
             print(file)
             print("Failed")
+
+def copy_file(file,destination):
+    pass
 
 # List all files in a directory
 def list_files(directory):
@@ -97,10 +103,10 @@ def cmds():
     print("""
         Commands:
         'move': Move file 
-        'delete': Delete file
+        'del': Delete file
         'copy': Copy file
         'create': Create file
-        'createdir': Create folder in current folder or somewhere else
+        'createdir': Create folder in current folder
         'cd': Change directory, or when used without an argument, prints out current working directory
         'list': List all files in current directory   
         'quit': Exit script
@@ -110,12 +116,14 @@ def cmds():
     """)
 
 # DON'T CHANGE THE ORDER
-command_list = ["move", "delete", "copy", "createdir", "cd", "cmds", "list", "quit", "..","c", "create"]
+command_list = ["move", "del", "copy", "createdir", "cd", "cmds", "list", "quit", "..","c", "create"]
 
 
-# Used fo the 'changedir' command, used to go up one directory
+# Used for the 'changedir' command, used to go up one directory
 go_up_one = command_list[8]
 copy_chdir = command_list[9]
+
+
 
 while True:
     user_input = input(f"{current_directory} ")
@@ -161,15 +169,23 @@ while True:
     # COPY COMMAND
         elif command_entered == command_list[2]:
             if len(user_list) > 2:
-                # TODO make file copy
-                if os.path.isfile(user_list[1]) and os.path.isdir(user_list[2]):
-                    cmd = f'copy "{user_list[1]}" "{"2" + user_list[1]}"'
-                    os.system(cmd)
+                if os.path.isfile(user_list[1]):
+                    file_to_be_copied = user_list[1]
+                    copy_to = user_list[2]
+
+                    if file_to_be_copied == copy_to:
+                        print("File cannot be copied with the same name. Change the copied file's name.")
+                    else:
+                        shutil.copyfile(user_list[1], user_list[2])
+                        print(f"File has been copied to: {copy_to}")
             else:
                 print("The 'copy' command must have 2 arguments: file and destination")
     # CREATE DIRECTORY COMMAND
         elif command_entered == command_list[3]:
-            print("Create directory")
+            if len(user_list) > 1:
+                create_directory(user_list[1])
+            else:
+                print("you need to name it lol")
     # CHANGE DIRECTORY COMMAND
         # Change directory or print working directory
         elif command_entered == command_list[4]:
@@ -209,8 +225,17 @@ while True:
 
     # CREATE FILE
         elif command_entered == command_list[10]:
-            create_file(user_list[1])
+            if len(user_list) > 1:
+                create_file(user_list[1])
+                extra_word = list()
+                # uh idk how to explain but it just tells the user what words were omitted from filename
+                if len(user_list) > 2:
+                    for i in user_list[2:]:
+                        extra_word.append(i)
+                    print(f"The following words were omitted: {extra_word}, this is because you need to use quotes to handle files with spaces.")
 
+            else:
+                print("Name it!")
         elif command_entered == command_list[7]:
             print("Exiting...")
             break
