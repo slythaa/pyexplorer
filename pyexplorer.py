@@ -1,5 +1,6 @@
 import os
 import shutil
+import shlex
 
 import pyperclip
 
@@ -43,6 +44,21 @@ def move_files(file, destination):
         else:
             print("Not a file in current directory")
 
+# TODO create file, not hard do now
+def create_file(file):
+
+    isfile = os.path.isfile(file)
+    if isfile:
+        print("Cannot create, file already exists.")
+    else:
+        try:
+            with open(file, 'w') as f:
+                pass
+            print(f"File '{file}' has been created!")
+        except:
+            print(file)
+            print("Failed")
+
 # List all files in a directory
 def list_files(directory):
 
@@ -83,15 +99,18 @@ def cmds():
         'move': Move file 
         'delete': Delete file
         'copy': Copy file
+        'create': Create file
         'createdir': Create folder in current folder or somewhere else
         'cd': Change directory, or when used without an argument, prints out current working directory
         'list': List all files in current directory   
         'quit': Exit script
         'c': Copy current directory to clipboard to get by faster
+        
+        [TIP]: Make sure to wrap paths with spaces in quotes!
     """)
 
 # DON'T CHANGE THE ORDER
-command_list = ["move", "delete", "copy", "createdir", "cd", "cmds", "list", "quit", "..","c"]
+command_list = ["move", "delete", "copy", "createdir", "cd", "cmds", "list", "quit", "..","c", "create"]
 
 
 # Used fo the 'changedir' command, used to go up one directory
@@ -105,14 +124,11 @@ while True:
     while user_input.strip() == "":
         user_input = input(f"{current_directory} ")
 
-    # Empty list of user words
-    user_list = list()
+    user_input = user_input.replace('\\', '/')
 
-    # Check user input for commands
-    for i in user_input.split():
-        #print(i, end=' ')
-        user_list.append(i)
-
+    # Split user input using shlex
+    # I think it just finds quotes in a string and combines it into one string, useful for what I'm doing
+    user_list = shlex.split(user_input)
     command_entered = user_list[0]
 
 
@@ -127,17 +143,21 @@ while True:
                 print("The move command requires 2 arguments.")
     # DELETE COMMAND
         elif command_entered == command_list[1]:
-            if os.path.isfile(user_list[1]):
-                os.remove(user_list[1])
-                print("File deleted!")
-            else:
-                # If not recognised as a file, do one last check then exit
-                file = current_directory + "\\" + user_list[1]
-                if os.path.isfile(file):
-                    os.remove(file)
+
+            if len(user_list) > 1:
+                if os.path.isfile(user_list[1]):
+                    os.remove(user_list[1])
                     print("File deleted!")
                 else:
-                    print("Not a file")
+                    # If not recognised as a file, do one last check then exit
+                    file = current_directory + "\\" + user_list[1]
+                    if os.path.isfile(file):
+                        os.remove(file)
+                        print("File deleted!")
+                    else:
+                        print("Not a file")
+            else:
+                print("Delete command requires a file to be deleted.")
     # COPY COMMAND
         elif command_entered == command_list[2]:
             if len(user_list) > 2:
@@ -158,7 +178,11 @@ while True:
                     change = os.path.abspath(user_list[1])
                     current_directory = str(change)
                 else:
-                    print("Not a directory! We can't move to nowhere!")
+                    user_list[1] = current_directory + "\\" + user_list[1]
+                    if os.path.isdir(user_list[1]):
+                        current_directory = user_list[1]
+                    else:
+                        print("Not a directory! We can't move to nowhere!\nMake sure to wrap filenames or paths with spaces in double quotes!")
 
             else:
                 print(f"\nCurrent directory: {current_directory}\n")
@@ -167,6 +191,7 @@ while True:
         elif command_entered == command_list[5]:
             cmds()
 
+    # LIST ITEMS COMMAND
         # List all items in directory
         elif command_entered == command_list[6]:
             # Check if user_input has an argument
@@ -182,8 +207,18 @@ while True:
             pyperclip.copy(current_directory)
             print("Copied current directory!")
 
+    # CREATE FILE
+        elif command_entered == command_list[10]:
+            create_file(user_list[1])
+
         elif command_entered == command_list[7]:
             print("Exiting...")
             break
     else:
-        print(f"Invalid command '{user_list[0]}', enter 'cmds' for list of commands.")
+        print(f"Invalid command '{command_entered}', enter 'cmds' for list of commands.")
+
+
+
+
+
+
